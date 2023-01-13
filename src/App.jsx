@@ -16,6 +16,7 @@ const initialState = [
 const App = () => {
 
   const [todo, setTodo] = useState(initialState)
+  const [option, setOption] = useState('all')
 
   const createTodo = (title) => {
     const newTodo = {
@@ -39,6 +40,21 @@ const App = () => {
   const clearCompleted = () => {
     setTodo(todo.filter(item => !item.completed))
   }
+
+  const filterTodo = () => {
+    switch (option) {
+      case 'all':
+        return todo;
+      case 'active':
+        return todo.filter(item => !item.completed);
+      case 'completed':
+        return todo.filter(item => item.completed);
+      default:
+        todo;
+    }
+  }
+
+  const changeFilterButton = (option) => setOption(option) 
   
 
   return (
@@ -50,9 +66,15 @@ const App = () => {
         <TodoCreate createTodo={createTodo}/>
        
         {/* TodoList  (TodoItem) TodoUpdate & TodoDelete*/}
-        <TodoList todo={todo} deleteTodo={deleteTodo} updateTodo={updateTodo} todoItems={todoItems} clearCompleted={clearCompleted}/>
+        <TodoList 
+          todo={filterTodo()} 
+          deleteTodo={deleteTodo} 
+          updateTodo={updateTodo} 
+          todoItems={todoItems} 
+          clearCompleted={clearCompleted}
+        />
         
-        <TodoFilter/>
+        <TodoFilter changeFilterButton={changeFilterButton} option={option}/>
       </main>
 
       <Footer/>    
