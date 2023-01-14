@@ -1,4 +1,4 @@
-
+import { DragDropContext } from "@hello-pangea/dnd";
 import { useEffect, useState } from 'react'
 import Footer from './components/Footer'
 import Header from './components/Header'
@@ -6,14 +6,20 @@ import TodoCreate from './components/TodoCreate'
 import TodoFilter from './components/TodoFilter'
 import TodoList from './components/TodoList'
 
-// const initialState = [
-//   {id: 1, title: 'study english', completed: true},
-//   {id: 2, title: 'study react', completed: false},
-//   {id: 3, title: 'study MySQL', completed: true},
-//   {id: 4, title: 'app', completed: false},
-// ]
+const initialState = JSON.parse(localStorage.getItem("todo")) || [
+  {id: 1, title: 'study english', completed: true},
+  {id: 2, title: 'study react', completed: false},
+  {id: 3, title: 'study MySQL', completed: true},
+  {id: 4, title: 'app', completed: false}
+];
 
-const initialState = JSON.parse(localStorage.getItem("todo")) || [];
+const reorder = (list, startIndex, endIndex) => {
+  const result = [...list];
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
 
 const App = () => {
 
@@ -61,7 +67,20 @@ const App = () => {
   }
 
   const changeFilterButton = (option) => setOption(option) 
-  
+
+  const handleDragEnd = (result) => {
+    const { destination, source } = result;
+        if (!destination) return;
+        if (
+            source.index === destination.index &&
+            source.droppableId === destination.droppableId
+        )
+            return;
+
+        setTodo((prevTasks) =>
+            reorder(prevTasks, source.index, destination.index)
+        );
+  }  
 
   return (
     <div className='min-h-screen bg-gray-200 bg-[url("./assets/images/bg-mobile-light.jpg")] bg-no-repeat bg-contain dark:bg-gray-900 dark:bg-[url("./assets/images/bg-mobile-dark.jpg")] transition-all duration-1000 md:bg-[url("./assets/images/bg-desktop-light.jpg")] md:dark:bg-[url("./assets/images/bg-desktop-dark.jpg")]'>
@@ -72,13 +91,15 @@ const App = () => {
         <TodoCreate createTodo={createTodo}/>
        
         {/* TodoList  (TodoItem) TodoUpdate & TodoDelete*/}
-        <TodoList 
-          todo={filterTodo()} 
-          deleteTodo={deleteTodo} 
-          updateTodo={updateTodo} 
-          todoItems={todoItems} 
-          clearCompleted={clearCompleted}
-        />
+       <DragDropContext onDragEnd={handleDragEnd}>
+          <TodoList 
+            todo={filterTodo()} 
+            deleteTodo={deleteTodo} 
+            updateTodo={updateTodo} 
+            todoItems={todoItems} 
+            clearCompleted={clearCompleted}
+          />
+        </DragDropContext>
         
         <TodoFilter changeFilterButton={changeFilterButton} option={option}/>
       </main>
