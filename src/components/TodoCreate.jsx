@@ -21,7 +21,7 @@ const TodoCreate = ({createTodo}) => {
         <input 
         type="text" 
         placeholder='Ingrese la tarea'
-        className='w-full outline-none dark:bg-gray-800 transition-all duration-1000'
+        className='w-full outline-none dark:bg-gray-800 dark:text-gray-300 transition-all duration-1000'
         value={titleTodo}
         onChange={(e) => setTitleTodo(e.target.value)}
         />
